@@ -65,6 +65,7 @@ pub fn tokenizeToList(
     delimiter: u8,
 ) !std.ArrayList([]const u8) {
     var result = try std.ArrayList([]const u8).initCapacity(allocator, 10);
+    errdefer result.deinit(allocator);
     var tokens = std.mem.tokenizeScalar(u8, s, delimiter);
 
     while (tokens.next()) |token| {
@@ -82,6 +83,7 @@ pub fn trimLine(line: []const u8) []const u8 {
 /// Split lines from data and return non-empty trimmed lines
 pub fn readLines(allocator: std.mem.Allocator, data: []const u8) !std.ArrayList([]const u8) {
     var lines = try std.ArrayList([]const u8).initCapacity(allocator, 100);
+    errdefer lines.deinit(allocator);
     var line_iter = std.mem.tokenizeScalar(u8, data, '\n');
 
     while (line_iter.next()) |line| {
@@ -92,4 +94,37 @@ pub fn readLines(allocator: std.mem.Allocator, data: []const u8) !std.ArrayList(
     }
 
     return lines;
+}
+
+test "tokenizeToList releases memory after allocation failure" {
+    const check = struct {
+        fn run(allocator: std.mem.Allocator) !void {
+            var tokens = try tokenizeToList(allocator, "0,1,2,3,4,5,6,7,8,9,10", ',');
+            defer tokens.deinit(allocator);
+
+            try std.testing.expectEqual(@as(usize, 11), tokens.items.len);
+        }
+    }.run;
+
+    try std.testing.checkAllAllocationFailures(std.testing.allocator, check, .{});
+}
+
+test "readLines releases memory after allocation failure" {
+    const check = struct {
+        fn run(allocator: std.mem.Allocator) !void {
+            var input: std.ArrayList(u8) = .{};
+            defer input.deinit(allocator);
+
+            for (0..101) |_| {
+                try input.appendSlice(allocator, "x\n");
+            }
+
+            var lines = try readLines(allocator, input.items);
+            defer lines.deinit(allocator);
+
+            try std.testing.expectEqual(@as(usize, 101), lines.items.len);
+        }
+    }.run;
+
+    try std.testing.checkAllAllocationFailures(std.testing.allocator, check, .{});
 }
