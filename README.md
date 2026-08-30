@@ -7,6 +7,14 @@ Solving [Advent of Code 2025](https://adventofcode.com/2025) in Zig.
 
 ## Build
 
+The development environment provides Zig 0.15.2 through Nix and direnv:
+
+```bash
+direnv allow
+```
+
+Alternatively, enter it directly with `nix develop`.
+
 ```bash
 zig build
 ```
