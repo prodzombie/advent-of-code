@@ -121,6 +121,7 @@ fn parseColumn(
     col: usize,
 ) !Problem {
     var numbers = std.ArrayList(u64){};
+    errdefer numbers.deinit(allocator);
 
     const bounds = findProblemBounds(lines, col);
     const num_rows = lines.len - 1;
@@ -186,6 +187,7 @@ fn parseColumnPart2(
 ) !Problem {
     const bounds = findProblemBounds(lines, col);
     var numbers = std.ArrayList(u64){};
+    errdefer numbers.deinit(allocator);
     const num_rows = lines.len - 1;
 
     var c: isize = @intCast(bounds.right);
@@ -254,4 +256,35 @@ fn solvePart1Impl(allocator: std.mem.Allocator) !u64 {
 
 fn solvePart2Impl(allocator: std.mem.Allocator) !u64 {
     return solvePart2(allocator, data);
+}
+
+test "column parsers release numbers after later parse errors" {
+    const checkPart1 = struct {
+        fn run(allocator: std.mem.Allocator) !void {
+            const lines = [_][]const u8{ "123", "?" };
+            var problem = parseColumn(allocator, &lines, 0) catch |err| switch (err) {
+                error.InvalidOperation => return,
+                else => return err,
+            };
+            defer problem.deinit(allocator);
+
+            return error.ExpectedInvalidOperation;
+        }
+    }.run;
+
+    const checkPart2 = struct {
+        fn run(allocator: std.mem.Allocator) !void {
+            const lines = [_][]const u8{ "123", "?" };
+            var problem = parseColumnPart2(allocator, &lines, 0) catch |err| switch (err) {
+                error.InvalidOperation => return,
+                else => return err,
+            };
+            defer problem.deinit(allocator);
+
+            return error.ExpectedInvalidOperation;
+        }
+    }.run;
+
+    try std.testing.checkAllAllocationFailures(std.testing.allocator, checkPart1, .{});
+    try std.testing.checkAllAllocationFailures(std.testing.allocator, checkPart2, .{});
 }
