@@ -20,7 +20,7 @@ fn parseInput(allocator: std.mem.Allocator, input: []const u8) !u.graph.StringGr
         if (std.mem.indexOf(u8, trimmed, ":")) |colon_idx| {
             const device = std.mem.trim(u8, trimmed[0..colon_idx], " ");
             const outputs_str = trimmed[colon_idx + 1 ..];
-            
+
             var outputs = std.mem.tokenizeScalar(u8, outputs_str, ' ');
             while (outputs.next()) |output| {
                 const output_trimmed = std.mem.trim(u8, output, " ");
@@ -47,7 +47,7 @@ fn countPathsMemoized(
 
     var total: u64 = 0;
     const neighbors = graph.getNeighbors(current);
-    
+
     for (neighbors) |next_id| {
         total += try countPathsMemoized(next_id, target, graph, cache);
     }
@@ -56,7 +56,7 @@ fn countPathsMemoized(
     return total;
 }
 
-fn solvePart1Impl(_: *anyopaque, allocator: std.mem.Allocator) !u64 {
+fn solvePart1Impl(allocator: std.mem.Allocator) !u64 {
     var graph = try parseInput(allocator, data);
     defer graph.deinit();
 
@@ -83,7 +83,7 @@ fn pathProduct(
     return product;
 }
 
-fn solvePart2Impl(_: *anyopaque, allocator: std.mem.Allocator) !u64 {
+fn solvePart2Impl(allocator: std.mem.Allocator) !u64 {
     var graph = try parseInput(allocator, data);
     defer graph.deinit();
 
@@ -99,21 +99,7 @@ fn solvePart2Impl(_: *anyopaque, allocator: std.mem.Allocator) !u64 {
     return path_a + path_b;
 }
 
-pub const Day11Solution = struct {
-    const vtable = u.solution.DaySolution.VTable{
-        .solvePart1 = solvePart1Impl,
-        .solvePart2 = solvePart2Impl,
-        .getMetrics = getMetricsImpl,
-    };
-
-    pub fn asDaySolution() u.solution.DaySolution {
-        return u.solution.DaySolution{
-            .ptr = undefined,
-            .vtable = &vtable,
-        };
-    }
-
-    fn getMetricsImpl(_: *anyopaque, allocator: std.mem.Allocator) !u.solution.Metrics {
-        return u.solution.measureMetrics(allocator, solvePart1Impl, solvePart2Impl);
-    }
+pub const solution: u.solution.DaySolution = .{
+    .solve_part_1 = solvePart1Impl,
+    .solve_part_2 = solvePart2Impl,
 };

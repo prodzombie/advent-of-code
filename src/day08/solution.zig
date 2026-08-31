@@ -43,8 +43,6 @@ fn parsePoints(allocator: std.mem.Allocator, input: []const u8) !std.ArrayList(P
     return points;
 }
 
-
-
 fn compareSizesDescending(_: void, a: usize, b: usize) bool {
     return a > b;
 }
@@ -106,29 +104,15 @@ pub fn solvePart2(allocator: std.mem.Allocator, input: []const u8) !u64 {
     return 0;
 }
 
-pub const Day8Solution = struct {
-    const vtable = u.solution.DaySolution.VTable{
-        .solvePart1 = solvePart1Impl,
-        .solvePart2 = solvePart2Impl,
-        .getMetrics = getMetricsImpl,
-    };
-
-    pub fn asDaySolution() u.solution.DaySolution {
-        return u.solution.DaySolution{
-            .ptr = undefined,
-            .vtable = &vtable,
-        };
-    }
-
-    fn solvePart1Impl(_: *anyopaque, allocator: std.mem.Allocator) !u64 {
-        return try solvePart1(allocator, data);
-    }
-
-    fn solvePart2Impl(_: *anyopaque, allocator: std.mem.Allocator) !u64 {
-        return try solvePart2(allocator, data);
-    }
-
-    fn getMetricsImpl(_: *anyopaque, allocator: std.mem.Allocator) !u.solution.Metrics {
-        return u.solution.measureMetrics(allocator, solvePart1Impl, solvePart2Impl);
-    }
+pub const solution: u.solution.DaySolution = .{
+    .solve_part_1 = solvePart1Impl,
+    .solve_part_2 = solvePart2Impl,
 };
+
+fn solvePart1Impl(allocator: std.mem.Allocator) !u64 {
+    return solvePart1(allocator, data);
+}
+
+fn solvePart2Impl(allocator: std.mem.Allocator) !u64 {
+    return solvePart2(allocator, data);
+}

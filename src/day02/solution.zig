@@ -9,17 +9,17 @@ pub fn isInvalidIdPart1(n: u64) bool {
     // Ok so we have a million numbers to check. Converting each one to a string
     // and comparing halves would be super slow. Instead, I use pure arithmetic:
     // division and modulo to extract the left and right halves mathematically.
-    
+
     // Count how many digits this number has
     var temp = n;
     var digit_count: u32 = 0;
     while (temp > 0) : (temp /= 10) {
         digit_count += 1;
     }
-    
+
     // Odd digit count means the halves can never match, so bail early
     if (digit_count % 2 != 0) return false;
-    
+
     // Now extract left and right halves using powers of 10.
     // Example: n=123123, digit_count=6, half=3, divisor=10^3=1000
     //   left = 123123 / 1000 = 123
@@ -27,10 +27,10 @@ pub fn isInvalidIdPart1(n: u64) bool {
     //   left == right -> true (this is a valid ID)
     const half = digit_count / 2;
     const divisor = std.math.pow(u64, 10, half);
-    
+
     const left = n / divisor;
     const right = n % divisor;
-    
+
     return left == right;
 }
 
@@ -58,74 +58,60 @@ pub fn isInvalidIdPart2(n: u64) bool {
     return false;
 }
 
-pub const Day2Solution = struct {
-    const vtable = u.solution.DaySolution.VTable{
-        .solvePart1 = solvePart1Impl,
-        .solvePart2 = solvePart2Impl,
-        .getMetrics = getMetricsImpl,
-    };
-
-    pub fn asDaySolution() u.solution.DaySolution {
-        return u.solution.DaySolution{
-            .ptr = undefined,
-            .vtable = &vtable,
-        };
-    }
-
-    fn solvePart1Impl(_: *anyopaque, _: std.mem.Allocator) !u64 {
-        // Parse the input and iterate through all ID ranges.
-        // For each ID in each range, check if it matches Part 1 criteria.
-        var lines = std.mem.tokenizeScalar(u8, data, '\n');
-        var part1_total: u64 = 0;
-
-        while (lines.next()) |line| {
-            var items = std.mem.tokenizeScalar(u8, line, ',');
-
-            while (items.next()) |entry| {
-                const range = u.parse.parseRange(entry) catch continue;
-                const start = range.start;
-                const stop = range.stop;
-
-                // Check every ID in this range
-                var i = start;
-                while (i <= stop) : (i += 1) {
-                    if (isInvalidIdPart1(i)) {
-                        part1_total += i;
-                    }
-                }
-            }
-        }
-
-        return part1_total;
-    }
-
-    fn solvePart2Impl(_: *anyopaque, _: std.mem.Allocator) !u64 {
-        // Same as Part 1, but with the stricter Part 2 criteria (repeating patterns).
-        var lines = std.mem.tokenizeScalar(u8, data, '\n');
-        var part2_total: u64 = 0;
-
-        while (lines.next()) |line| {
-            var items = std.mem.tokenizeScalar(u8, line, ',');
-
-            while (items.next()) |entry| {
-                const range = u.parse.parseRange(entry) catch continue;
-                const start = range.start;
-                const stop = range.stop;
-
-                // Check every ID in this range for Part 2 pattern matching
-                var i = start;
-                while (i <= stop) : (i += 1) {
-                    if (isInvalidIdPart2(i)) {
-                        part2_total += i;
-                    }
-                }
-            }
-        }
-
-        return part2_total;
-    }
-
-    fn getMetricsImpl(_: *anyopaque, allocator: std.mem.Allocator) !u.solution.Metrics {
-        return u.solution.measureMetrics(allocator, solvePart1Impl, solvePart2Impl);
-    }
+pub const solution: u.solution.DaySolution = .{
+    .solve_part_1 = solvePart1Impl,
+    .solve_part_2 = solvePart2Impl,
 };
+
+fn solvePart1Impl(_: std.mem.Allocator) !u64 {
+    // Parse the input and iterate through all ID ranges.
+    // For each ID in each range, check if it matches Part 1 criteria.
+    var lines = std.mem.tokenizeScalar(u8, data, '\n');
+    var part1_total: u64 = 0;
+
+    while (lines.next()) |line| {
+        var items = std.mem.tokenizeScalar(u8, line, ',');
+
+        while (items.next()) |entry| {
+            const range = u.parse.parseRange(entry) catch continue;
+            const start = range.start;
+            const stop = range.stop;
+
+            // Check every ID in this range
+            var i = start;
+            while (i <= stop) : (i += 1) {
+                if (isInvalidIdPart1(i)) {
+                    part1_total += i;
+                }
+            }
+        }
+    }
+
+    return part1_total;
+}
+
+fn solvePart2Impl(_: std.mem.Allocator) !u64 {
+    // Same as Part 1, but with the stricter Part 2 criteria (repeating patterns).
+    var lines = std.mem.tokenizeScalar(u8, data, '\n');
+    var part2_total: u64 = 0;
+
+    while (lines.next()) |line| {
+        var items = std.mem.tokenizeScalar(u8, line, ',');
+
+        while (items.next()) |entry| {
+            const range = u.parse.parseRange(entry) catch continue;
+            const start = range.start;
+            const stop = range.stop;
+
+            // Check every ID in this range for Part 2 pattern matching
+            var i = start;
+            while (i <= stop) : (i += 1) {
+                if (isInvalidIdPart2(i)) {
+                    part2_total += i;
+                }
+            }
+        }
+    }
+
+    return part2_total;
+}

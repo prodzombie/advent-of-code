@@ -7,7 +7,7 @@ const data = @embedFile("input.txt");
 
 pub fn solvePart1(grid: [][]const u8) usize {
     if (grid.len == 0) return 0;
-    
+
     var valid_rolls: usize = 0;
 
     for (0..grid.len) |y| {
@@ -46,56 +46,42 @@ pub fn solvePart2(allocator: std.mem.Allocator, grid: [][]u8) !usize {
         }
 
         for (candidates.items) |p| {
-            grid[@intCast(p.y)][@intCast(p.x)] = '.'; 
+            grid[@intCast(p.y)][@intCast(p.x)] = '.';
         }
 
         total_removed += candidates.items.len;
 
         candidates.clearRetainingCapacity();
-    } 
-         
+    }
+
     return total_removed;
 }
 
-pub const Day4Solution = struct {
-    const vtable = u.solution.DaySolution.VTable{
-        .solvePart1 = solvePart1Impl,
-        .solvePart2 = solvePart2Impl,
-        .getMetrics = getMetricsImpl,
-    };
-
-    pub fn asDaySolution() u.solution.DaySolution {
-        return u.solution.DaySolution{
-            .ptr = undefined,
-            .vtable = &vtable,
-        };
-    }
-
-    fn solvePart1Impl(_: *anyopaque, allocator: std.mem.Allocator) !u64 {
-        var grid = try u.grid.readGrid(allocator, data);
-        defer {
-            for (grid.items) |line| {
-                allocator.free(line);
-            }
-            grid.deinit(allocator);
-        }
-        const result = solvePart1(@as([][]const u8, @ptrCast(grid.items)));
-        return @intCast(result);
-    }
-
-    fn solvePart2Impl(_: *anyopaque, allocator: std.mem.Allocator) !u64 {
-        var grid = try u.grid.readGrid(allocator, data);
-        defer {
-            for (grid.items) |line| {
-                allocator.free(line);
-            }
-            grid.deinit(allocator);
-        }
-        const result = try solvePart2(allocator, grid.items);
-        return @intCast(result);
-    }
-
-    fn getMetricsImpl(_: *anyopaque, allocator: std.mem.Allocator) !u.solution.Metrics {
-        return u.solution.measureMetrics(allocator, solvePart1Impl, solvePart2Impl);
-    }
+pub const solution: u.solution.DaySolution = .{
+    .solve_part_1 = solvePart1Impl,
+    .solve_part_2 = solvePart2Impl,
 };
+
+fn solvePart1Impl(allocator: std.mem.Allocator) !u64 {
+    var grid = try u.grid.readGrid(allocator, data);
+    defer {
+        for (grid.items) |line| {
+            allocator.free(line);
+        }
+        grid.deinit(allocator);
+    }
+    const result = solvePart1(@as([][]const u8, @ptrCast(grid.items)));
+    return @intCast(result);
+}
+
+fn solvePart2Impl(allocator: std.mem.Allocator) !u64 {
+    var grid = try u.grid.readGrid(allocator, data);
+    defer {
+        for (grid.items) |line| {
+            allocator.free(line);
+        }
+        grid.deinit(allocator);
+    }
+    const result = try solvePart2(allocator, grid.items);
+    return @intCast(result);
+}

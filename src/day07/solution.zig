@@ -33,7 +33,7 @@ const RIGHT = [2]isize{ 0, 1 };
 pub fn solvePart1(allocator: std.mem.Allocator, input: []const u8) !u64 {
     const parsed = try parseGrid(allocator, input);
     defer allocator.free(parsed.grid);
-    
+
     const grid = parsed.grid;
     const height = parsed.height;
     const width = parsed.width;
@@ -70,7 +70,7 @@ pub fn solvePart1(allocator: std.mem.Allocator, input: []const u8) !u64 {
     // Process beams using DFS
     while (queue.items.len > 0) {
         const beam = queue.pop().?; // Nice sintax for orelse null: I we will always had something to pop
-        
+
         // Raycast downward from this beam's starting position until hitting a splitter
         if (u.grid.raycast(grid, beam, DOWN, height, width, '^')) |splitter| {
             // Hit a splitter
@@ -96,14 +96,14 @@ pub fn solvePart1(allocator: std.mem.Allocator, input: []const u8) !u64 {
     return split_count;
 }
 
-// I have to find some way to memorize the path tanken. 
+// I have to find some way to memorize the path tanken.
 // This seems a bottom up problem.
 //https://en.wikipedia.org/wiki/Topological_sorting: I don't want to wrap my head
 //around Parallel algorithms, so... TODO: re-read that
 pub fn solvePart2(allocator: std.mem.Allocator, input: []const u8) !u64 {
     const parsed = try parseGrid(allocator, input);
     defer allocator.free(parsed.grid);
-    
+
     const grid = parsed.grid;
     const height = parsed.height;
     const width = parsed.width;
@@ -168,7 +168,7 @@ pub fn solvePart2(allocator: std.mem.Allocator, input: []const u8) !u64 {
         }
     }
 
-    // I need to find the beam path that goes straight down 
+    // I need to find the beam path that goes straight down
     const start = u.grid.findCell(grid, 'S') orelse return 0;
 
     // When it hits the first splitter, I return that memo value.
@@ -182,29 +182,15 @@ pub fn solvePart2(allocator: std.mem.Allocator, input: []const u8) !u64 {
     }
 }
 
-pub const Day7Solution = struct {
-    const vtable = u.solution.DaySolution.VTable{
-        .solvePart1 = solvePart1Impl,
-        .solvePart2 = solvePart2Impl,
-        .getMetrics = getMetricsImpl,
-    };
-
-    pub fn asDaySolution() u.solution.DaySolution {
-        return u.solution.DaySolution{
-            .ptr = undefined,
-            .vtable = &vtable,
-        };
-    }
-
-    fn solvePart1Impl(_: *anyopaque, allocator: std.mem.Allocator) !u64 {
-        return try solvePart1(allocator, data);
-    }
-
-    fn solvePart2Impl(_: *anyopaque, allocator: std.mem.Allocator) !u64 {
-        return try solvePart2(allocator, data);
-    }
-
-    fn getMetricsImpl(_: *anyopaque, allocator: std.mem.Allocator) !u.solution.Metrics {
-        return u.solution.measureMetrics(allocator, solvePart1Impl, solvePart2Impl);
-    }
+pub const solution: u.solution.DaySolution = .{
+    .solve_part_1 = solvePart1Impl,
+    .solve_part_2 = solvePart2Impl,
 };
+
+fn solvePart1Impl(allocator: std.mem.Allocator) !u64 {
+    return solvePart1(allocator, data);
+}
+
+fn solvePart2Impl(allocator: std.mem.Allocator) !u64 {
+    return solvePart2(allocator, data);
+}

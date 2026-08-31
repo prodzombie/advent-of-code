@@ -26,7 +26,7 @@ fn parseShapes(_: std.mem.Allocator, input: []const u8) ![6]usize {
     return cell_counts;
 }
 
-fn solvePart1Impl(_: *anyopaque, allocator: std.mem.Allocator) !u64 {
+fn solvePart1Impl(allocator: std.mem.Allocator) !u64 {
     const shape_cells = try parseShapes(allocator, data);
 
     var blank_pos: usize = 0;
@@ -76,25 +76,11 @@ fn solvePart1Impl(_: *anyopaque, allocator: std.mem.Allocator) !u64 {
     return count;
 }
 
-fn solvePart2Impl(_: *anyopaque, _: std.mem.Allocator) !u64 {
+fn solvePart2Impl(_: std.mem.Allocator) !u64 {
     return 0;
 }
 
-pub const Day12Solution = struct {
-    const vtable = u.solution.DaySolution.VTable{
-        .solvePart1 = solvePart1Impl,
-        .solvePart2 = solvePart2Impl,
-        .getMetrics = getMetricsImpl,
-    };
-
-    pub fn asDaySolution() u.solution.DaySolution {
-        return u.solution.DaySolution{
-            .ptr = undefined,
-            .vtable = &vtable,
-        };
-    }
-
-    fn getMetricsImpl(_: *anyopaque, allocator: std.mem.Allocator) !u.solution.Metrics {
-        return u.solution.measureMetrics(allocator, solvePart1Impl, solvePart2Impl);
-    }
+pub const solution: u.solution.DaySolution = .{
+    .solve_part_1 = solvePart1Impl,
+    .solve_part_2 = solvePart2Impl,
 };

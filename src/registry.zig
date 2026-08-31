@@ -26,18 +26,18 @@ pub const DaySolutionEntry = struct {
 pub const all_solutions = blk: {
     var days: [12]DaySolutionEntry = undefined;
 
-    days[0] = .{ .day_number = 1, .solution = day1.Day1Solution.asDaySolution() };
-    days[1] = .{ .day_number = 2, .solution = day2.Day2Solution.asDaySolution() };
-    days[2] = .{ .day_number = 3, .solution = day3.Day3Solution.asDaySolution() };
-    days[3] = .{ .day_number = 4, .solution = day4.Day4Solution.asDaySolution() };
-    days[4] = .{ .day_number = 5, .solution = day5.Day5Solution.asDaySolution() };
-    days[5] = .{ .day_number = 6, .solution = day6.Day6Solution.asDaySolution() };
-    days[6] = .{ .day_number = 7, .solution = day7.Day7Solution.asDaySolution() };
-    days[7] = .{ .day_number = 8, .solution = day8.Day8Solution.asDaySolution() };
-    days[8] = .{ .day_number = 9, .solution = day9.Day9Solution.asDaySolution() };
-    days[9] = .{ .day_number = 10, .solution = day10.Day10Solution.asDaySolution() };
-    days[10] = .{ .day_number = 11, .solution = day11.Day11Solution.asDaySolution() };
-    days[11] = .{ .day_number = 12, .solution = day12.Day12Solution.asDaySolution() };
+    days[0] = .{ .day_number = 1, .solution = day1.solution };
+    days[1] = .{ .day_number = 2, .solution = day2.solution };
+    days[2] = .{ .day_number = 3, .solution = day3.solution };
+    days[3] = .{ .day_number = 4, .solution = day4.solution };
+    days[4] = .{ .day_number = 5, .solution = day5.solution };
+    days[5] = .{ .day_number = 6, .solution = day6.solution };
+    days[6] = .{ .day_number = 7, .solution = day7.solution };
+    days[7] = .{ .day_number = 8, .solution = day8.solution };
+    days[8] = .{ .day_number = 9, .solution = day9.solution };
+    days[9] = .{ .day_number = 10, .solution = day10.solution };
+    days[10] = .{ .day_number = 11, .solution = day11.solution };
+    days[11] = .{ .day_number = 12, .solution = day12.solution };
 
     break :blk days;
 };

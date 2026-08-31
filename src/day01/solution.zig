@@ -47,49 +47,35 @@ fn parseInput(allocator: std.mem.Allocator) !std.ArrayList(i32) {
     return ops;
 }
 
-pub const Day1Solution = struct {
-    const vtable = u.solution.DaySolution.VTable{
-        .solvePart1 = solvePart1Impl,
-        .solvePart2 = solvePart2Impl,
-        .getMetrics = getMetricsImpl,
-    };
-
-    pub fn asDaySolution() u.solution.DaySolution {
-        return u.solution.DaySolution{
-            .ptr = undefined,
-            .vtable = &vtable,
-        };
-    }
-
-    fn solvePart1Impl(_: *anyopaque, allocator: std.mem.Allocator) !u64 {
-        var ops = try parseInput(allocator);
-        defer ops.deinit(allocator);
-
-        var start: i32 = STARTING_POSITION;
-        var res: i32 = 0;
-        for (ops.items) |value| {
-            start = turn(start, value);
-            if (start == 0) {
-                res += 1;
-            }
-        }
-        return @intCast(res);
-    }
-
-    fn solvePart2Impl(_: *anyopaque, allocator: std.mem.Allocator) !u64 {
-        var ops = try parseInput(allocator);
-        defer ops.deinit(allocator);
-
-        var start: i32 = STARTING_POSITION;
-        var res: i32 = 0;
-        for (ops.items) |value| {
-            res += countZeroCrossings(start, value);
-            start = turn(start, value);
-        }
-        return @intCast(res);
-    }
-
-    fn getMetricsImpl(_: *anyopaque, allocator: std.mem.Allocator) !u.solution.Metrics {
-        return u.solution.measureMetrics(allocator, solvePart1Impl, solvePart2Impl);
-    }
+pub const solution: u.solution.DaySolution = .{
+    .solve_part_1 = solvePart1Impl,
+    .solve_part_2 = solvePart2Impl,
 };
+
+fn solvePart1Impl(allocator: std.mem.Allocator) !u64 {
+    var ops = try parseInput(allocator);
+    defer ops.deinit(allocator);
+
+    var start: i32 = STARTING_POSITION;
+    var res: i32 = 0;
+    for (ops.items) |value| {
+        start = turn(start, value);
+        if (start == 0) {
+            res += 1;
+        }
+    }
+    return @intCast(res);
+}
+
+fn solvePart2Impl(allocator: std.mem.Allocator) !u64 {
+    var ops = try parseInput(allocator);
+    defer ops.deinit(allocator);
+
+    var start: i32 = STARTING_POSITION;
+    var res: i32 = 0;
+    for (ops.items) |value| {
+        res += countZeroCrossings(start, value);
+        start = turn(start, value);
+    }
+    return @intCast(res);
+}

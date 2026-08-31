@@ -11,55 +11,29 @@ pub const Metrics = struct {
     }
 };
 
+pub const Solver = *const fn (allocator: std.mem.Allocator) anyerror!u64;
+
 pub const DaySolution = struct {
-    ptr: *anyopaque,
-    vtable: *const VTable,
-
-    pub const VTable = struct {
-        solvePart1: *const fn (ctx: *anyopaque, allocator: std.mem.Allocator) anyerror!u64,
-        solvePart2: *const fn (ctx: *anyopaque, allocator: std.mem.Allocator) anyerror!u64,
-        getMetrics: *const fn (ctx: *anyopaque, allocator: std.mem.Allocator) anyerror!Metrics,
-    };
-
-    pub fn solvePart1(self: DaySolution, allocator: std.mem.Allocator) !u64 {
-        return self.vtable.solvePart1(self.ptr, allocator);
-    }
-
-    pub fn solvePart2(self: DaySolution, allocator: std.mem.Allocator) !u64 {
-        return self.vtable.solvePart2(self.ptr, allocator);
-    }
-
-    pub fn getMetrics(self: DaySolution, allocator: std.mem.Allocator) !Metrics {
-        return self.vtable.getMetrics(self.ptr, allocator);
-    }
+    solve_part_1: Solver,
+    solve_part_2: Solver,
 };
-
-/// Create a child arena allocator from a parent allocator.
-/// The arena will have its own memory pool and clean itself up when passed to deinit.
-/// Useful for parts that do temporary allocations that should be freed together.
-pub fn createArenaAllocator(parent_allocator: std.mem.Allocator) !std.heap.ArenaAllocator {
-    return std.heap.ArenaAllocator.init(parent_allocator);
-}
 
 /// Measure performance of both solution parts with proper resource cleanup.
 /// Each part gets its own arena allocator for isolated memory management.
 pub fn measureMetrics(
     parent_allocator: std.mem.Allocator,
-    solvePart1Fn: *const fn (*anyopaque, std.mem.Allocator) anyerror!u64,
-    solvePart2Fn: *const fn (*anyopaque, std.mem.Allocator) anyerror!u64,
+    solution: DaySolution,
 ) !Metrics {
     var timer = try std.time.Timer.start();
 
-    // Part 1: Use arena allocator for clean separation
-    var arena1 = try createArenaAllocator(parent_allocator);
+    var arena1 = std.heap.ArenaAllocator.init(parent_allocator);
     defer arena1.deinit();
-    const part1_result = try solvePart1Fn(undefined, arena1.allocator());
+    const part1_result = try solution.solve_part_1(arena1.allocator());
     const part1_time = timer.lap();
 
-    // Part 2: Use separate arena allocator for clean separation
-    var arena2 = try createArenaAllocator(parent_allocator);
+    var arena2 = std.heap.ArenaAllocator.init(parent_allocator);
     defer arena2.deinit();
-    const part2_result = try solvePart2Fn(undefined, arena2.allocator());
+    const part2_result = try solution.solve_part_2(arena2.allocator());
     const part2_time = timer.lap();
 
     return Metrics{

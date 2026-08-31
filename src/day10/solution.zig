@@ -466,68 +466,41 @@ fn solvePart2(
     );
 }
 
-pub const Day10Solution = struct {
-    const vtable = u.solution.DaySolution.VTable{
-        .solvePart1 = solvePart1Impl,
-        .solvePart2 = solvePart2Impl,
-        .getMetrics = getMetricsImpl,
-    };
+pub const solution: u.solution.DaySolution = .{
+    .solve_part_1 = solvePart1Impl,
+    .solve_part_2 = solvePart2Impl,
+};
 
-    pub fn asDaySolution() u.solution.DaySolution {
-        return u.solution.DaySolution{
-            .ptr = undefined,
-            .vtable = &vtable,
-        };
+fn solvePart1Impl(allocator: std.mem.Allocator) !u64 {
+    var lines = try u.parse.readLines(allocator, data);
+    defer lines.deinit(allocator);
+
+    var total: u64 = 0;
+    for (lines.items) |line| {
+        var machine = try parseMachinePart1(allocator, line);
+        defer machine.deinit(allocator);
+
+        const min_presses = try solvePart1(allocator, machine);
+        total += min_presses;
     }
 
-    fn solvePart1Impl(
-        _: *anyopaque,
-        allocator: std.mem.Allocator,
-    ) !u64 {
-        var lines = try u.parse.readLines(allocator, data);
-        defer lines.deinit(allocator);
+    return total;
+}
 
-        var total: u64 = 0;
-        for (lines.items) |line| {
-            var machine = try parseMachinePart1(allocator, line);
-            defer machine.deinit(allocator);
+fn solvePart2Impl(allocator: std.mem.Allocator) !u64 {
+    var lines = try u.parse.readLines(allocator, data);
+    defer lines.deinit(allocator);
 
-            const min_presses = try solvePart1(allocator, machine);
+    var total: u64 = 0;
+    for (lines.items) |line| {
+        var machine = try parseMachinePart2(allocator, line);
+        defer machine.deinit(allocator);
+
+        const min_presses = try solvePart2(allocator, machine);
+        if (min_presses != INF_COST) {
             total += min_presses;
         }
-
-        return total;
     }
 
-    fn solvePart2Impl(
-        _: *anyopaque,
-        allocator: std.mem.Allocator,
-    ) !u64 {
-        var lines = try u.parse.readLines(allocator, data);
-        defer lines.deinit(allocator);
-
-        var total: u64 = 0;
-        for (lines.items) |line| {
-            var machine = try parseMachinePart2(allocator, line);
-            defer machine.deinit(allocator);
-
-            const min_presses = try solvePart2(allocator, machine);
-            if (min_presses != INF_COST) {
-                total += min_presses;
-            }
-        }
-
-        return total;
-    }
-
-    fn getMetricsImpl(
-        _: *anyopaque,
-        allocator: std.mem.Allocator,
-    ) !u.solution.Metrics {
-        return u.solution.measureMetrics(
-            allocator,
-            solvePart1Impl,
-            solvePart2Impl,
-        );
-    }
-};
+    return total;
+}

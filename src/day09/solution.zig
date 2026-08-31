@@ -3,20 +3,7 @@ const u = @import("utils");
 
 const data = @embedFile("input.txt");
 
-pub const Day9Solution = struct {
-    const vtable = u.solution.DaySolution.VTable{
-        .solvePart1 = solvePart1Impl,
-        .solvePart2 = solvePart2Impl,
-        .getMetrics = getMetricsImpl,
-    };
-
-    pub fn asDaySolution() u.solution.DaySolution {
-        return u.solution.DaySolution{
-            .ptr = undefined,
-            .vtable = &vtable,
-        };
-    }
-
+const Implementation = struct {
     fn parseInput(allocator: std.mem.Allocator, input: []const u8) !std.ArrayList(u.geometry.Point) {
         var points = try std.ArrayList(u.geometry.Point).initCapacity(allocator, 10);
         errdefer points.deinit(allocator);
@@ -61,7 +48,7 @@ pub const Day9Solution = struct {
         return @as(i64, @intCast(width)) * @as(i64, @intCast(height));
     }
 
-    fn solvePart1Impl(_: *anyopaque, allocator: std.mem.Allocator) !u64 {
+    fn solvePart1Impl(allocator: std.mem.Allocator) !u64 {
         var points_list = try parseInput(allocator, data);
         defer points_list.deinit(allocator);
 
@@ -160,7 +147,7 @@ pub const Day9Solution = struct {
         return null;
     }
 
-    fn solvePart2Impl(_: *anyopaque, allocator: std.mem.Allocator) !u64 {
+    fn solvePart2Impl(allocator: std.mem.Allocator) !u64 {
         var points_list = try parseInput(allocator, data);
         defer points_list.deinit(allocator);
 
@@ -178,8 +165,9 @@ pub const Day9Solution = struct {
         const max_area = findMaxAreaWithPairs(points, edges.items, computeAreaPart2);
         return @intCast(max_area);
     }
+};
 
-    fn getMetricsImpl(_: *anyopaque, allocator: std.mem.Allocator) !u.solution.Metrics {
-        return u.solution.measureMetrics(allocator, solvePart1Impl, solvePart2Impl);
-    }
+pub const solution: u.solution.DaySolution = .{
+    .solve_part_1 = Implementation.solvePart1Impl,
+    .solve_part_2 = Implementation.solvePart2Impl,
 };

@@ -38,8 +38,8 @@ pub fn main() !void {
     if (std.mem.eql(u8, args[1], "all")) {
         for (registry.all_solutions) |entry| {
             if (entry.solution) |solution| {
-                const metrics = try solution.getMetrics(allocator);
-                
+                const metrics = try u.solution.measureMetrics(allocator, solution);
+
                 std.debug.print("Day {d}:\n", .{entry.day_number});
                 printParts(metrics, "  ");
             }
@@ -54,8 +54,8 @@ pub fn main() !void {
 
     if (registry.getSolution(day)) |entry| {
         if (entry.solution) |solution| {
-            const metrics = try solution.getMetrics(allocator);
-            
+            const metrics = try u.solution.measureMetrics(allocator, solution);
+
             std.debug.print("Day {d}:\n", .{entry.day_number});
             printParts(metrics, "");
             printMetrics(metrics);
