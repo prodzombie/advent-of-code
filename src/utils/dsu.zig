@@ -12,7 +12,9 @@ pub fn DSU(comptime T: type) type {
         /// Initialize a new DSU with n elements, each in its own set
         pub fn init(allocator: std.mem.Allocator, n: usize) !Self {
             var parent = try std.ArrayList(T).initCapacity(allocator, n);
+            errdefer parent.deinit(allocator);
             var size = try std.ArrayList(T).initCapacity(allocator, n);
+            errdefer size.deinit(allocator);
 
             for (0..n) |i| {
                 try parent.append(allocator, @intCast(i));
@@ -81,6 +83,7 @@ pub fn DSU(comptime T: type) type {
         /// Returns an ArrayList of sizes, one entry per disjoint set
         pub fn getRootSizes(self: *Self, allocator: std.mem.Allocator) !std.ArrayList(T) {
             var roots = try std.ArrayList(T).initCapacity(allocator, 100);
+            errdefer roots.deinit(allocator);
             var seen = std.AutoHashMap(T, void).init(allocator);
             defer seen.deinit();
 
@@ -95,4 +98,33 @@ pub fn DSU(comptime T: type) type {
             return roots;
         }
     };
+}
+
+test "DSU init releases partial state after allocation failure" {
+    const check = struct {
+        fn run(allocator: std.mem.Allocator) !void {
+            var dsu = try DSU(usize).init(allocator, 10);
+            defer dsu.deinit(allocator);
+
+            try std.testing.expectEqual(@as(usize, 10), dsu.parent.items.len);
+        }
+    }.run;
+
+    try std.testing.checkAllAllocationFailures(std.testing.allocator, check, .{});
+}
+
+test "getRootSizes releases its result after allocation failure" {
+    const check = struct {
+        fn run(allocator: std.mem.Allocator) !void {
+            var dsu = try DSU(usize).init(allocator, 101);
+            defer dsu.deinit(allocator);
+
+            var sizes = try dsu.getRootSizes(allocator);
+            defer sizes.deinit(allocator);
+
+            try std.testing.expectEqual(@as(usize, 101), sizes.items.len);
+        }
+    }.run;
+
+    try std.testing.checkAllAllocationFailures(std.testing.allocator, check, .{});
 }
