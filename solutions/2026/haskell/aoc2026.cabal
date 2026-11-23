@@ -11,7 +11,9 @@ common defaults
 library
   import: defaults
   hs-source-dirs: src
+  build-depends: containers
   exposed-modules: Day01
+                   Aoc.Grid
                    Aoc.Geometry
                    Aoc.Parse
 
