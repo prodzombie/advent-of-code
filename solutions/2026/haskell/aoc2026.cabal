@@ -11,8 +11,10 @@ common defaults
 library
   import: defaults
   hs-source-dirs: src
+  build-depends: array
   build-depends: containers
   exposed-modules: Day01
+                   Aoc.DSU
                    Aoc.Graph
                    Aoc.Grid
                    Aoc.Geometry
