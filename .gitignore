@@ -11,5 +11,6 @@ zig-out/
 
 .DS_Store
 
+/inputs/
 input.txt
-tests/performance.log
+performance.log

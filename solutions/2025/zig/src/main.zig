@@ -22,9 +22,10 @@ fn measureDay(
     allocator: std.mem.Allocator,
     day: usize,
     solution: u.solution.DaySolution,
+    input_path: ?[]const u8,
 ) !u.solution.Metrics {
     var path_buffer: [64]u8 = undefined;
-    const path = try std.fmt.bufPrint(&path_buffer, "src/day{d:0>2}/input.txt", .{day});
+    const path = input_path orelse try std.fmt.bufPrint(&path_buffer, "../../../inputs/2025/day{d:0>2}.txt", .{day});
     const input = std.fs.cwd().readFileAlloc(allocator, path, 16 * 1024 * 1024) catch |err| {
         std.debug.print("Could not read {s}: {s}\n", .{ path, @errorName(err) });
         return err;
@@ -41,19 +42,20 @@ pub fn main() !void {
     const args = try std.process.argsAlloc(allocator);
     defer std.process.argsFree(allocator, args);
 
-    if (args.len < 2) {
-        std.debug.print("Usage: {s} <day|all>\n", .{args[0]});
+    if (args.len < 2 or args.len > 3) {
+        std.debug.print("Usage: {s} <day [input-path]|all>\n", .{args[0]});
         std.debug.print("Examples:\n", .{});
         std.debug.print("  {s} 1   - Run day 1\n", .{args[0]});
         std.debug.print("  {s} all - Run all days\n", .{args[0]});
-        return;
+        return error.InvalidArguments;
     }
 
     // Check if running all days
     if (std.mem.eql(u8, args[1], "all")) {
+        if (args.len != 2) return error.InvalidArguments;
         for (registry.all_solutions) |entry| {
             if (entry.solution) |solution| {
-                const metrics = try measureDay(allocator, entry.day_number, solution);
+                const metrics = try measureDay(allocator, entry.day_number, solution, null);
 
                 std.debug.print("Day {d}:\n", .{entry.day_number});
                 printParts(metrics, "  ");
@@ -64,12 +66,12 @@ pub fn main() !void {
 
     const day = std.fmt.parseInt(usize, args[1], 10) catch {
         std.debug.print("Error: Invalid day number\n", .{});
-        return;
+        return error.InvalidArguments;
     };
 
     if (registry.getSolution(day)) |entry| {
         if (entry.solution) |solution| {
-            const metrics = try measureDay(allocator, entry.day_number, solution);
+            const metrics = try measureDay(allocator, entry.day_number, solution, if (args.len == 3) args[2] else null);
 
             std.debug.print("Day {d}:\n", .{entry.day_number});
             printParts(metrics, "");
@@ -77,5 +79,6 @@ pub fn main() !void {
         }
     } else {
         std.debug.print("Day {d} not implemented yet\n", .{day});
+        return error.DayNotImplemented;
     }
 }

@@ -1,5 +1,5 @@
 {
-  description = "Development environment for Advent of Zig 2025";
+  description = "Development environment for Advent of Code";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";

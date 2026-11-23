@@ -1,55 +1,28 @@
-# Advent of Zig 2025
+# Advent of Code
 
-Solving [Advent of Code 2025](https://adventofcode.com/2025) in Zig.
+Personal Advent of Code solutions organized by year and language. The original
+2025 Zig project lives in `solutions/2025/zig/`.
 
-> **Note:** Input files (`input.txt`) are not included in this repository per [Advent of Code's terms of service](https://adventofcode.com/about#faq_copying). Download your personal inputs from [adventofcode.com](https://adventofcode.com) and place them in the respective day directories (e.g., `src/day01/input.txt`).
-> I had to do a complete rewrite of this repo history to remove them :,(
+Keep personal inputs in the gitignored `inputs/<year>/dayNN.txt` directory tree.
+For example, Day 1 of 2025 reads `inputs/2025/day01.txt`. Download your inputs
+from [Advent of Code](https://adventofcode.com/).
 
-## Build
+## 2025 Zig
 
-The development environment provides Zig 0.15.2 through Nix and direnv:
+Use Zig 0.15.2. The root Nix flake provides it through `nix develop` or
+`direnv allow`.
 
-```bash
-direnv allow
-```
-
-Alternatively, enter it directly with `nix develop`.
-
-```bash
+```sh
+cd solutions/2025/zig
 zig build
-```
-
-## Run
-
-Puzzle inputs are read at runtime. You can build and run the sample tests without them.
-
-```bash
-zig build run -- <day|all>
-```
-
-**Examples:**
-- `zig build run -- 1` - Run day 1
-- `zig build run -- all` - Run all days
-
-## Performance Testing
-
-```bash
-zig build perf
-```
-
-Save a new baseline:
-```bash
-zig build perf -- save-baseline
-```
-
-## Tests
-
-```bash
 zig build test
+zig build run -- 1
+zig build run -- all
+zig build run -- 1 /path/to/sample.txt
 ```
 
-### Regression Tests
-
-```bash
-zig build regression
-```
+Builds and sample tests work without personal inputs. With the 2025 inputs in
+place, run `zig build regression` to check the recorded answers and
+`zig build perf` to compare timings with the saved baseline. To replace the
+baseline, run `zig build perf -- save-baseline`. The performance script uses
+Bash 4 or later.
