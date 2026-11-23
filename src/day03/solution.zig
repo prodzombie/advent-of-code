@@ -3,8 +3,6 @@
 const std = @import("std");
 const u = @import("utils");
 
-const data = @embedFile("input.txt");
-
 fn largestByRemovingK(bank: []const u8, out_len: usize) u64 {
     if (bank.len < out_len) return 0;
 
@@ -45,7 +43,7 @@ pub const solution: u.solution.DaySolution = .{
     .solve_part_2 = solvePart2Impl,
 };
 
-fn solvePart1Impl(_: std.mem.Allocator) !u64 {
+fn solvePart1Impl(_: std.mem.Allocator, data: []const u8) !u64 {
     var lines = std.mem.tokenizeScalar(u8, data, '\n');
     var part1_total: u64 = 0;
 
@@ -58,7 +56,7 @@ fn solvePart1Impl(_: std.mem.Allocator) !u64 {
     return part1_total;
 }
 
-fn solvePart2Impl(_: std.mem.Allocator) !u64 {
+fn solvePart2Impl(_: std.mem.Allocator, data: []const u8) !u64 {
     var lines = std.mem.tokenizeScalar(u8, data, '\n');
     var part2_total: u64 = 0;
 

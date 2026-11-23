@@ -18,6 +18,21 @@ fn printMetrics(metrics: u.solution.Metrics) void {
     printTime("Total", metrics.total_time_ms(), "  ");
 }
 
+fn measureDay(
+    allocator: std.mem.Allocator,
+    day: usize,
+    solution: u.solution.DaySolution,
+) !u.solution.Metrics {
+    var path_buffer: [64]u8 = undefined;
+    const path = try std.fmt.bufPrint(&path_buffer, "src/day{d:0>2}/input.txt", .{day});
+    const input = std.fs.cwd().readFileAlloc(allocator, path, 16 * 1024 * 1024) catch |err| {
+        std.debug.print("Could not read {s}: {s}\n", .{ path, @errorName(err) });
+        return err;
+    };
+    defer allocator.free(input);
+    return u.solution.measureMetrics(allocator, solution, input);
+}
+
 pub fn main() !void {
     var gpa: std.heap.GeneralPurposeAllocator(.{}) = .{};
     defer _ = gpa.deinit();
@@ -38,7 +53,7 @@ pub fn main() !void {
     if (std.mem.eql(u8, args[1], "all")) {
         for (registry.all_solutions) |entry| {
             if (entry.solution) |solution| {
-                const metrics = try u.solution.measureMetrics(allocator, solution);
+                const metrics = try measureDay(allocator, entry.day_number, solution);
 
                 std.debug.print("Day {d}:\n", .{entry.day_number});
                 printParts(metrics, "  ");
@@ -54,7 +69,7 @@ pub fn main() !void {
 
     if (registry.getSolution(day)) |entry| {
         if (entry.solution) |solution| {
-            const metrics = try u.solution.measureMetrics(allocator, solution);
+            const metrics = try measureDay(allocator, entry.day_number, solution);
 
             std.debug.print("Day {d}:\n", .{entry.day_number});
             printParts(metrics, "");

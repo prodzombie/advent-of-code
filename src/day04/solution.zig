@@ -3,8 +3,6 @@
 const std = @import("std");
 const u = @import("utils");
 
-const data = @embedFile("input.txt");
-
 pub fn solvePart1(grid: [][]const u8) usize {
     if (grid.len == 0) return 0;
 
@@ -62,7 +60,7 @@ pub const solution: u.solution.DaySolution = .{
     .solve_part_2 = solvePart2Impl,
 };
 
-fn solvePart1Impl(allocator: std.mem.Allocator) !u64 {
+fn solvePart1Impl(allocator: std.mem.Allocator, data: []const u8) !u64 {
     var grid = try u.grid.readGrid(allocator, data);
     defer {
         for (grid.items) |line| {
@@ -74,7 +72,7 @@ fn solvePart1Impl(allocator: std.mem.Allocator) !u64 {
     return @intCast(result);
 }
 
-fn solvePart2Impl(allocator: std.mem.Allocator) !u64 {
+fn solvePart2Impl(allocator: std.mem.Allocator, data: []const u8) !u64 {
     var grid = try u.grid.readGrid(allocator, data);
     defer {
         for (grid.items) |line| {

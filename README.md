@@ -21,6 +21,8 @@ zig build
 
 ## Run
 
+Puzzle inputs are read at runtime. You can build and run the sample tests without them.
+
 ```bash
 zig build run -- <day|all>
 ```

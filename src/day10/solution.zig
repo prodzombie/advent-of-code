@@ -1,8 +1,6 @@
 const std = @import("std");
 const u = @import("utils");
 
-const data = @embedFile("input.txt");
-
 const MAX_COUNTERS = 16;
 const INITIAL_BUTTON_CAPACITY = 10;
 const INITIAL_QUEUE_CAPACITY = 10000;
@@ -471,7 +469,7 @@ pub const solution: u.solution.DaySolution = .{
     .solve_part_2 = solvePart2Impl,
 };
 
-fn solvePart1Impl(allocator: std.mem.Allocator) !u64 {
+fn solvePart1Impl(allocator: std.mem.Allocator, data: []const u8) !u64 {
     var lines = try u.parse.readLines(allocator, data);
     defer lines.deinit(allocator);
 
@@ -487,7 +485,7 @@ fn solvePart1Impl(allocator: std.mem.Allocator) !u64 {
     return total;
 }
 
-fn solvePart2Impl(allocator: std.mem.Allocator) !u64 {
+fn solvePart2Impl(allocator: std.mem.Allocator, data: []const u8) !u64 {
     var lines = try u.parse.readLines(allocator, data);
     defer lines.deinit(allocator);
 

@@ -1,8 +1,6 @@
 const std = @import("std");
 const u = @import("utils");
 
-const data = @embedFile("input.txt");
-
 const Implementation = struct {
     fn parseInput(allocator: std.mem.Allocator, input: []const u8) !std.ArrayList(u.geometry.Point) {
         var points = try std.ArrayList(u.geometry.Point).initCapacity(allocator, 10);
@@ -48,7 +46,7 @@ const Implementation = struct {
         return @as(i64, @intCast(width)) * @as(i64, @intCast(height));
     }
 
-    fn solvePart1Impl(allocator: std.mem.Allocator) !u64 {
+    fn solvePart1Impl(allocator: std.mem.Allocator, data: []const u8) !u64 {
         var points_list = try parseInput(allocator, data);
         defer points_list.deinit(allocator);
 
@@ -147,7 +145,7 @@ const Implementation = struct {
         return null;
     }
 
-    fn solvePart2Impl(allocator: std.mem.Allocator) !u64 {
+    fn solvePart2Impl(allocator: std.mem.Allocator, data: []const u8) !u64 {
         var points_list = try parseInput(allocator, data);
         defer points_list.deinit(allocator);
 

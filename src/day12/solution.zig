@@ -1,8 +1,6 @@
 const std = @import("std");
 const u = @import("utils");
 
-const data = @embedFile("input.txt");
-
 fn parseShapes(_: std.mem.Allocator, input: []const u8) ![6]usize {
     var cell_counts: [6]usize = .{ 0, 0, 0, 0, 0, 0 };
     var lines = std.mem.tokenizeScalar(u8, input, '\n');
@@ -26,7 +24,7 @@ fn parseShapes(_: std.mem.Allocator, input: []const u8) ![6]usize {
     return cell_counts;
 }
 
-fn solvePart1Impl(allocator: std.mem.Allocator) !u64 {
+fn solvePart1Impl(allocator: std.mem.Allocator, data: []const u8) !u64 {
     const shape_cells = try parseShapes(allocator, data);
 
     var blank_pos: usize = 0;
@@ -76,7 +74,7 @@ fn solvePart1Impl(allocator: std.mem.Allocator) !u64 {
     return count;
 }
 
-fn solvePart2Impl(_: std.mem.Allocator) !u64 {
+fn solvePart2Impl(_: std.mem.Allocator, _: []const u8) !u64 {
     return 0;
 }
 

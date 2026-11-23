@@ -3,8 +3,6 @@
 const std = @import("std");
 const u = @import("utils");
 
-const data = @embedFile("input.txt");
-
 pub fn isInvalidIdPart1(n: u64) bool {
     // Ok so we have a million numbers to check. Converting each one to a string
     // and comparing halves would be super slow. Instead, I use pure arithmetic:
@@ -63,7 +61,7 @@ pub const solution: u.solution.DaySolution = .{
     .solve_part_2 = solvePart2Impl,
 };
 
-fn solvePart1Impl(_: std.mem.Allocator) !u64 {
+fn solvePart1Impl(_: std.mem.Allocator, data: []const u8) !u64 {
     // Parse the input and iterate through all ID ranges.
     // For each ID in each range, check if it matches Part 1 criteria.
     var lines = std.mem.tokenizeScalar(u8, data, '\n');
@@ -90,7 +88,7 @@ fn solvePart1Impl(_: std.mem.Allocator) !u64 {
     return part1_total;
 }
 
-fn solvePart2Impl(_: std.mem.Allocator) !u64 {
+fn solvePart2Impl(_: std.mem.Allocator, data: []const u8) !u64 {
     // Same as Part 1, but with the stricter Part 2 criteria (repeating patterns).
     var lines = std.mem.tokenizeScalar(u8, data, '\n');
     var part2_total: u64 = 0;

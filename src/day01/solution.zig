@@ -3,8 +3,6 @@
 const std = @import("std");
 const u = @import("utils");
 
-const day1_data = @embedFile("input.txt");
-
 const STARTING_POSITION: i32 = 50;
 const MODULO: i32 = 100;
 const INITIAL_CAPACITY: usize = 100;
@@ -30,11 +28,11 @@ pub fn countZeroCrossings(start: i32, op: i32) i32 {
 
 /// Parse input data once and return all operations
 /// Caller owns the returned ArrayList and must deinit it
-fn parseInput(allocator: std.mem.Allocator) !std.ArrayList(i32) {
+fn parseInput(allocator: std.mem.Allocator, data: []const u8) !std.ArrayList(i32) {
     var ops = try std.ArrayList(i32).initCapacity(allocator, INITIAL_CAPACITY);
     errdefer ops.deinit(allocator);
 
-    var lines = std.mem.splitSequence(u8, day1_data, "\n");
+    var lines = std.mem.splitSequence(u8, data, "\n");
     while (lines.next()) |line| {
         if (line.len < 2) continue;
 
@@ -52,8 +50,8 @@ pub const solution: u.solution.DaySolution = .{
     .solve_part_2 = solvePart2Impl,
 };
 
-fn solvePart1Impl(allocator: std.mem.Allocator) !u64 {
-    var ops = try parseInput(allocator);
+fn solvePart1Impl(allocator: std.mem.Allocator, data: []const u8) !u64 {
+    var ops = try parseInput(allocator, data);
     defer ops.deinit(allocator);
 
     var start: i32 = STARTING_POSITION;
@@ -67,8 +65,8 @@ fn solvePart1Impl(allocator: std.mem.Allocator) !u64 {
     return @intCast(res);
 }
 
-fn solvePart2Impl(allocator: std.mem.Allocator) !u64 {
-    var ops = try parseInput(allocator);
+fn solvePart2Impl(allocator: std.mem.Allocator, data: []const u8) !u64 {
+    var ops = try parseInput(allocator, data);
     defer ops.deinit(allocator);
 
     var start: i32 = STARTING_POSITION;

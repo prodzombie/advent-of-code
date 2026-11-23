@@ -1,8 +1,6 @@
 const std = @import("std");
 const u = @import("utils");
 
-const data = @embedFile("input.txt");
-
 const CacheKey = struct {
     current: u32,
     target: u32,
@@ -56,7 +54,7 @@ fn countPathsMemoized(
     return total;
 }
 
-fn solvePart1Impl(allocator: std.mem.Allocator) !u64 {
+fn solvePart1Impl(allocator: std.mem.Allocator, data: []const u8) !u64 {
     var graph = try parseInput(allocator, data);
     defer graph.deinit();
 
@@ -83,7 +81,7 @@ fn pathProduct(
     return product;
 }
 
-fn solvePart2Impl(allocator: std.mem.Allocator) !u64 {
+fn solvePart2Impl(allocator: std.mem.Allocator, data: []const u8) !u64 {
     var graph = try parseInput(allocator, data);
     defer graph.deinit();
 

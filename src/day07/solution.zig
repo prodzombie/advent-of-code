@@ -3,8 +3,6 @@
 const std = @import("std");
 const u = @import("utils");
 
-const data = @embedFile("input.txt");
-
 /// Parse grid from input and return (grid, height, width)
 /// Caller is responsible for freeing the grid array via allocator.free(grid)
 fn parseGrid(allocator: std.mem.Allocator, input: []const u8) !struct { grid: [][]const u8, height: usize, width: usize } {
@@ -187,10 +185,10 @@ pub const solution: u.solution.DaySolution = .{
     .solve_part_2 = solvePart2Impl,
 };
 
-fn solvePart1Impl(allocator: std.mem.Allocator) !u64 {
+fn solvePart1Impl(allocator: std.mem.Allocator, data: []const u8) !u64 {
     return solvePart1(allocator, data);
 }
 
-fn solvePart2Impl(allocator: std.mem.Allocator) !u64 {
+fn solvePart2Impl(allocator: std.mem.Allocator, data: []const u8) !u64 {
     return solvePart2(allocator, data);
 }
