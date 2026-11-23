@@ -13,6 +13,7 @@ library
   hs-source-dirs: src
   build-depends: containers
   exposed-modules: Day01
+                   Aoc.Graph
                    Aoc.Grid
                    Aoc.Geometry
                    Aoc.Parse
