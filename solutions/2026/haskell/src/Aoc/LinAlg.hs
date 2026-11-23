@@ -1,42 +1,50 @@
 module Aoc.LinAlg (gaussianElimination) where
 
-import Data.List (partition)
+import qualified Data.List as List
+
+-- Keep the target separate as coefficient columns are eliminated.
+data Equation = Equation [Integer] Integer
 
 -- Free variables are set to zero. Pivot values must be nonnegative integers.
 gaussianElimination :: Int -> [[Integer]] -> Either String [Integer]
 gaussianElimination variables matrix
   | variables < 0 = Left "Negative variable count"
-  | any (\row -> length row - 1 /= variables) matrix = Left "Invalid augmented matrix dimensions"
-  | otherwise = solve variables matrix
+  | otherwise = traverse toEquation matrix >>= solve variables
+  where
+    toEquation row = case splitAt variables row of
+      (coefficients, [target]) -> Right (Equation coefficients target)
+      _ -> Left "Invalid augmented matrix dimensions"
 
-solve :: Int -> [[Integer]] -> Either String [Integer]
-solve 0 rows
-  | any (/= [0]) rows = Left "Inconsistent system"
-  | otherwise = Right []
-solve remaining rows =
-  case partition zeroLeading rows of
-    (zeroRows, []) -> (0 :) <$> solve (remaining - 1) (map (drop 1) zeroRows)
-    (zeroRows, (pivot:coefficients):otherRows) -> do
-      let eliminate (factor:rest) =
-            normalize (zipWith (\a b -> pivot * a - factor * b) rest coefficients)
-          eliminate [] = []
-      suffix <- solve (remaining - 1) (map (drop 1) zeroRows ++ map eliminate otherRows)
-      let (terms, target) = splitAt (remaining - 1) coefficients
-      case target of
-        [rhs] ->
-          let (value, remainder) = (rhs - sum (zipWith (*) terms suffix)) `quotRem` pivot
-          in if remainder == 0 && value >= 0
-               then Right (value : suffix)
-               else Left "Expected a nonnegative integer solution"
-        _ -> Left "Invalid augmented matrix dimensions"
-    (_, []:_) -> Left "Invalid augmented matrix dimensions"
+solve :: Int -> [Equation] -> Either String [Integer]
+solve remaining equations
+  | any (/= 0) constantRows = Left "Inconsistent system"
+  | remaining == 0 = Right []
+  | otherwise =
+      case break (\(factor, _) -> factor /= 0) leadingRows of
+        (zeros, []) -> (0 :) <$> solve (remaining - 1) (map snd zeros)
+        (zeros, (pivot, equation):rest) -> do
+          suffix <- solve (remaining - 1) (map snd zeros ++ map (eliminate pivot equation) rest)
+          value <- backSubstitute pivot equation suffix
+          pure (value : suffix)
+  where
+    constantRows = [target | Equation [] target <- equations]
+    leadingRows = [(factor, Equation terms target) | Equation (factor:terms) target <- equations]
 
-zeroLeading :: [Integer] -> Bool
-zeroLeading (0:_) = True
-zeroLeading _ = False
+eliminate :: Integer -> Equation -> (Integer, Equation) -> Equation
+eliminate _ _ (0, equation) = equation
+eliminate pivot (Equation terms target) (factor, Equation otherTerms otherTarget) =
+  let coefficients = zipWith subtractPivot otherTerms terms
+      rhs = subtractPivot otherTarget target
+      divisor = List.foldl' gcd (abs rhs) coefficients
+  in if divisor > 1
+       then Equation (map (`quot` divisor) coefficients) (rhs `quot` divisor)
+       else Equation coefficients rhs
+  where
+    subtractPivot a b = pivot * a - factor * b
 
-normalize :: [Integer] -> [Integer]
-normalize row
-  | divisor > 1 = map (`quot` divisor) row
-  | otherwise = row
-  where divisor = foldr gcd 0 row
+backSubstitute :: Integer -> Equation -> [Integer] -> Either String Integer
+backSubstitute pivot (Equation terms target) suffix =
+  let (value, remainder) = (target - sum (zipWith (*) terms suffix)) `quotRem` pivot
+  in if remainder == 0 && value >= 0
+       then Right value
+       else Left "Expected a nonnegative integer solution"
