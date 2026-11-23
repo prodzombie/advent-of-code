@@ -14,8 +14,7 @@ The `inputs/` directory is ignored by version control.
 
 ## 2025 Zig
 
-Use Zig 0.15.2. The root Nix flake provides it through `nix develop` or
-`direnv allow`.
+Use Zig 0.15.2 on your `PATH`.
 
 ```sh
 cd solutions/2025/zig
@@ -47,3 +46,11 @@ cabal run aoc2026 -- /path/to/sample.txt
 The executable defaults to `inputs/2026/day01.txt` from the repository root.
 Day 1 currently reports that the solver is pending. The sample test runs
 without a personal input file.
+
+## Local tool paths
+
+If your compilers are already on `PATH`, you can run the commands above
+directly. To use a compiler installed elsewhere, put a `PATH_add` line in
+the gitignored `.envrc.local` and run `direnv allow` from the repository root.
+For example, `PATH_add "$HOME/.local/zig-0.15.2"` adds the directory containing
+the pinned Zig executable.

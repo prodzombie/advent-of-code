@@ -1,6 +1,7 @@
 .zig-cache/
 zig-out/
 .direnv/
+/.envrc.local
 
 *.o
 *.a
