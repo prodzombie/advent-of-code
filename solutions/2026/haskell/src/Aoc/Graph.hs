@@ -3,7 +3,7 @@ module Aoc.Graph
   , StringGraph, empty, lookupId, getId, addEdge, getNeighbors, nodeCount
   ) where
 
-import Aoc.Geometry (Point3D, euclideanDistance3DSq)
+import qualified Aoc.Geometry as Geometry
 import Data.List (tails)
 import qualified Data.IntMap.Strict as IntMap
 import qualified Data.Map.Strict as Map
@@ -14,9 +14,9 @@ data WeightedEdge = WeightedEdge { u :: !Int, v :: !Int, weight :: !Integer }
 compareEdgesAscending :: WeightedEdge -> WeightedEdge -> Ordering
 compareEdgesAscending a b = compare (weight a) (weight b)
 
-generateEdgesComplete :: [Point3D] -> [WeightedEdge]
+generateEdgesComplete :: [Geometry.Point3D] -> [WeightedEdge]
 generateEdgesComplete points =
-  [ WeightedEdge i j (euclideanDistance3DSq a b)
+  [ WeightedEdge i j (Geometry.squaredDistance3D a b)
   | (i, a):rest <- tails (zip [0..] points)
   , (j, b) <- rest
   ]

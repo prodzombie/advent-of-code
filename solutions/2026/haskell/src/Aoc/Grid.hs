@@ -3,7 +3,7 @@ module Aoc.Grid
   , findCell, movePoint, raycast
   ) where
 
-import Aoc.Geometry (Point(..))
+import Aoc.Geometry (Point2D(..))
 import Aoc.Parse (readLines)
 import Data.List (find)
 import qualified Data.Map.Strict as Map
@@ -14,8 +14,8 @@ type Grid = Map.Map (Integer, Integer) Char -- (row, column)
 dirs :: [Direction]
 dirs = [(dy, dx) | dy <- [-1..1], dx <- [-1..1], (dy, dx) /= (0, 0)]
 
-inBounds :: Point -> Integer -> Integer -> Bool
-inBounds (Point col row) height width =
+inBounds :: Point2D -> Integer -> Integer -> Bool
+inBounds (Point2D col row) height width =
   0 <= row && row < height && 0 <= col && col < width
 
 readGrid :: String -> Grid
@@ -25,28 +25,28 @@ readGrid input = Map.fromDistinctAscList
   , (col, cell) <- zip [0..] cells
   ]
 
-at :: Grid -> Point -> Maybe Char
-at grid (Point col row) = Map.lookup (row, col) grid
+at :: Grid -> Point2D -> Maybe Char
+at grid (Point2D col row) = Map.lookup (row, col) grid
 
-countNeighborsWhere :: Grid -> Point -> (Char -> Bool) -> Int
+countNeighborsWhere :: Grid -> Point2D -> (Char -> Bool) -> Int
 countNeighborsWhere grid point predicate =
   length [() | dir <- dirs, Just cell <- [at grid (step point dir)], predicate cell]
 
-findCell :: Grid -> Char -> Maybe Point
+findCell :: Grid -> Char -> Maybe Point2D
 findCell grid target = do
   ((row, col), _) <- find ((== target) . snd) (Map.toAscList grid)
-  pure (Point col row)
+  pure (Point2D col row)
 
-step :: Point -> Direction -> Point
-step (Point col row) (dy, dx) = Point (col + dx) (row + dy)
+step :: Point2D -> Direction -> Point2D
+step (Point2D col row) (dy, dx) = Point2D (col + dx) (row + dy)
 
-movePoint :: Point -> Direction -> Integer -> Integer -> Maybe Point
+movePoint :: Point2D -> Direction -> Integer -> Integer -> Maybe Point2D
 movePoint point direction height width
   | inBounds next height width = Just next
   | otherwise = Nothing
   where next = step point direction
 
-raycast :: Grid -> Point -> Direction -> Char -> Maybe Point
+raycast :: Grid -> Point2D -> Direction -> Char -> Maybe Point2D
 raycast _ _ (0, 0) _ = Nothing
 raycast grid start direction target = go (step start direction)
   where
