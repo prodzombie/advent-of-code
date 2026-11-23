@@ -1,0 +1,27 @@
+cabal-version: 3.0
+name: aoc2026
+version: 0.1.0.0
+build-type: Simple
+
+common defaults
+  default-language: Haskell2010
+  ghc-options: -Wall
+  build-depends: base >= 4.18 && < 5
+
+library
+  import: defaults
+  hs-source-dirs: src
+  exposed-modules: Day01
+
+executable aoc2026
+  import: defaults
+  hs-source-dirs: app
+  main-is: Main.hs
+  build-depends: aoc2026
+
+test-suite day01-tests
+  import: defaults
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: Main.hs
+  build-depends: aoc2026

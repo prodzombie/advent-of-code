@@ -14,3 +14,5 @@ zig-out/
 /inputs/
 input.txt
 performance.log
+
+/solutions/2026/haskell/dist-newstyle/

@@ -26,3 +26,19 @@ place, run `zig build regression` to check the recorded answers and
 `zig build perf` to compare timings with the saved baseline. To replace the
 baseline, run `zig build perf -- save-baseline`. The performance script uses
 Bash 4 or later.
+
+## 2026 Haskell
+
+Use GHC 9.6 or later and Cabal.
+
+```sh
+cd solutions/2026/haskell
+cabal build
+cabal test
+cabal run aoc2026
+cabal run aoc2026 -- /path/to/sample.txt
+```
+
+The executable defaults to `inputs/2026/day01.txt` from the repository root.
+Day 1 currently reports that the solver is pending. The sample test runs
+without a personal input file.
