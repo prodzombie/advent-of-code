@@ -1,53 +1,55 @@
 {-# LANGUAGE DataKinds #-}
 
-module Aoc.Graph
-  ( WeightedEdge(..), compareEdgesAscending, generateEdgesComplete
-  , StringGraph, empty, lookupId, getId, addEdge, getNeighbors, nodeCount
-  ) where
+module Aoc.Graph (
+    WeightedEdge (..),
+    compareEdgesAscending,
+    generateEdgesComplete,
+    Graph,
+    empty,
+    addNode,
+    addEdge,
+    fromEdges,
+    neighbors,
+    nodeCount,
+) where
 
 import qualified Aoc.Geometry as Geometry
-import Data.List (tails)
-import qualified Data.IntMap.Strict as IntMap
+import qualified Data.List as List
 import qualified Data.Map.Strict as Map
 
-data WeightedEdge = WeightedEdge { u :: !Int, v :: !Int, weight :: !Integer }
-  deriving (Eq, Show)
+data WeightedEdge = WeightedEdge {u :: !Int, v :: !Int, weight :: !Integer}
+    deriving (Eq, Show)
 
 compareEdgesAscending :: WeightedEdge -> WeightedEdge -> Ordering
 compareEdgesAscending a b = compare (weight a) (weight b)
 
 generateEdgesComplete :: [Geometry.Point 3] -> [WeightedEdge]
 generateEdgesComplete points =
-  [ WeightedEdge i j (Geometry.squaredDistance a b)
-  | (i, a):rest <- tails (zip [0..] points)
-  , (j, b) <- rest
-  ]
+    [ WeightedEdge i j (Geometry.squaredDistance a b)
+    | (i, a) : rest <- List.tails (zip [0 ..] points)
+    , (j, b) <- rest
+    ]
 
--- Neighbors are stored in reverse insertion order for constant-time prepend.
-data StringGraph = StringGraph !(Map.Map String Int) !(IntMap.IntMap [Int])
+-- Store outgoing edges in reverse insertion order for cheap prepending.
+newtype Graph node = Graph (Map.Map node [node])
 
-empty :: StringGraph
-empty = StringGraph Map.empty IntMap.empty
+empty :: Graph node
+empty = Graph Map.empty
 
-lookupId :: String -> StringGraph -> Maybe Int
-lookupId name (StringGraph names _) = Map.lookup name names
+addNode :: (Ord node) => node -> Graph node -> Graph node
+addNode node (Graph adjacency) =
+    Graph (Map.insertWith (\_ existing -> existing) node [] adjacency)
 
-getId :: String -> StringGraph -> (Int, StringGraph)
-getId name graph@(StringGraph names adj) =
-  case lookupId name graph of
-    Just node -> (node, graph)
-    Nothing ->
-      let node = nodeCount graph
-      in (node, StringGraph (Map.insert name node names) (IntMap.insert node [] adj))
-
-addEdge :: String -> String -> StringGraph -> StringGraph
+addEdge :: (Ord node) => node -> node -> Graph node -> Graph node
 addEdge from to graph =
-  let (source, graph') = getId from graph
-      (target, StringGraph names adj) = getId to graph'
-  in StringGraph names (IntMap.adjust (target :) source adj)
+    let Graph adjacency = addNode to graph
+     in Graph (Map.insertWith (++) from [to] adjacency)
 
-getNeighbors :: Int -> StringGraph -> Maybe [Int]
-getNeighbors node (StringGraph _ adj) = reverse <$> IntMap.lookup node adj
+fromEdges :: (Ord node) => [(node, node)] -> Graph node
+fromEdges = List.foldl' (\graph (from, to) -> addEdge from to graph) empty
 
-nodeCount :: StringGraph -> Int
-nodeCount (StringGraph names _) = Map.size names
+neighbors :: (Ord node) => node -> Graph node -> Maybe [node]
+neighbors node (Graph adjacency) = reverse <$> Map.lookup node adjacency
+
+nodeCount :: Graph node -> Int
+nodeCount (Graph adjacency) = Map.size adjacency
