@@ -1,26 +1,32 @@
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE StandaloneDeriving #-}
+
 module Aoc.Geometry (
-    Point2D (..),
-    Point3D (..),
+    Point (..),
     Segment (..),
-    squaredDistance2D,
-    squaredDistance3D,
+    squaredDistance,
 ) where
 
-data Point2D = Point2D {x :: !Integer, y :: !Integer}
+import GHC.TypeNats (Nat)
+
+-- The dimension index ensures that distance compares points of the same dimension.
+data Point (n :: Nat) where
+    Point2D :: {x :: !Integer, y :: !Integer} -> Point 2
+    Point3D :: !Integer -> !Integer -> !Integer -> Point 3
+
+deriving instance Eq (Point n)
+deriving instance Ord (Point n)
+deriving instance Show (Point n)
+
+data Segment = Segment {segmentStart :: !(Point 2), segmentEnd :: !(Point 2)}
     deriving (Eq, Ord, Show)
 
-data Point3D = Point3D !Integer !Integer !Integer
-    deriving (Eq, Ord, Show)
-
-data Segment = Segment {segmentStart :: !Point2D, segmentEnd :: !Point2D}
-    deriving (Eq, Ord, Show)
-
-squaredDistance2D :: Point2D -> Point2D -> Integer
-squaredDistance2D (Point2D ax ay) (Point2D bx by) =
+squaredDistance :: Point n -> Point n -> Integer
+squaredDistance (Point2D ax ay) (Point2D bx by) =
     square (bx - ax) + square (by - ay)
-
-squaredDistance3D :: Point3D -> Point3D -> Integer
-squaredDistance3D (Point3D ax ay az) (Point3D bx by bz) =
+squaredDistance (Point3D ax ay az) (Point3D bx by bz) =
     square (bx - ax) + square (by - ay) + square (bz - az)
 
 square :: Integer -> Integer
