@@ -12,6 +12,7 @@ library
   import: defaults
   hs-source-dirs: src
   exposed-modules: Day01
+                   Aoc.Parse
 
 executable aoc2026
   import: defaults
