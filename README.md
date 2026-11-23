@@ -1,11 +1,16 @@
 # Advent of Code
 
-Personal Advent of Code solutions organized by year and language. The original
-2025 Zig project lives in `solutions/2025/zig/`.
+My Advent of Code solutions, organized by year and language.
 
-Keep personal inputs in the gitignored `inputs/<year>/dayNN.txt` directory tree.
-For example, Day 1 of 2025 reads `inputs/2025/day01.txt`. Download your inputs
-from [Advent of Code](https://adventofcode.com/).
+| Year | Language | Project |
+| --- | --- | --- |
+| 2025 | Zig | [Days 1–12](solutions/2025/zig/) |
+| 2026 | Haskell | [Cabal scaffold](solutions/2026/haskell/) |
+
+Each project has its own build and test commands. Download your personal inputs
+from [Advent of Code](https://adventofcode.com/) and put them in
+`inputs/<year>/dayNN.txt`. For example, 2026 Day 1 uses `inputs/2026/day01.txt`.
+The `inputs/` directory is ignored by version control.
 
 ## 2025 Zig
 
